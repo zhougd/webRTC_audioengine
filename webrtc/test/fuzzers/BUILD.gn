@@ -1,0 +1,119 @@
+# Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+#
+# Use of this source code is governed by a BSD-style license
+# that can be found in the LICENSE file in the root of the source
+# tree. An additional intellectual property rights grant can be found
+# in the file PATENTS.  All contributing project authors may
+# be found in the AUTHORS file in the root of the source tree.
+
+import("//build/config/features.gni")
+import("//testing/test.gni")
+
+static_library("webrtc_fuzzer_main") {
+  public_configs = [ "../..:common_inherited_config" ]
+  sources = [
+    "webrtc_fuzzer_main.cc",
+  ]
+  deps = [
+    "../../system_wrappers:field_trial_default",
+    "../../system_wrappers:metrics_default",
+    "//testing/libfuzzer:libfuzzer_main",
+  ]
+}
+
+test("vp9_depacketizer_fuzzer") {
+  sources = [
+    "vp9_depacketizer_fuzzer.cc",
+  ]
+  deps = [
+    ":webrtc_fuzzer_main",
+    "../../modules/rtp_rtcp",
+  ]
+  if (is_clang) {
+    # Suppress warnings from Chrome's Clang plugins.
+    # See http://code.google.com/p/webrtc/issues/detail?id=163 for details.
+    configs -= [ "//build/config/clang:find_bad_constructs" ]
+  }
+}
+
+test("vp8_qp_parser_fuzzer") {
+  sources = [
+    "vp8_qp_parser_fuzzer.cc",
+  ]
+  deps = [
+    ":webrtc_fuzzer_main",
+    "../../modules/video_coding/",
+  ]
+
+  if (is_clang) {
+    # Suppress warnings from Chrome's Clang plugins.
+    # See http://code.google.com/p/webrtc/issues/detail?id=163 for details.
+    configs -= [ "//build/config/clang:find_bad_constructs" ]
+  }
+}
+
+test("producer_fec_fuzzer") {
+  sources = [
+    "producer_fec_fuzzer.cc",
+  ]
+  deps = [
+    ":webrtc_fuzzer_main",
+    "../../modules/rtp_rtcp/",
+  ]
+
+  if (is_clang) {
+    # Suppress warnings from Chrome's Clang plugins.
+    # See http://code.google.com/p/webrtc/issues/detail?id=163 for details.
+    configs -= [ "//build/config/clang:find_bad_constructs" ]
+  }
+}
+
+source_set("audio_decoder_fuzzer") {
+  sources = [
+    "audio_decoder_fuzzer.cc",
+    "audio_decoder_fuzzer.h",
+  ]
+  deps = [
+    ":webrtc_fuzzer_main",
+  ]
+}
+
+test("audio_decoder_ilbc_fuzzer") {
+  sources = [
+    "audio_decoder_ilbc_fuzzer.cc",
+  ]
+  deps = [
+    ":audio_decoder_fuzzer",
+    "../../modules/audio_coding:ilbc",
+  ]
+}
+
+test("audio_decoder_isac_fuzzer") {
+  sources = [
+    "audio_decoder_isac_fuzzer.cc",
+  ]
+  deps = [
+    ":audio_decoder_fuzzer",
+    "../../modules/audio_coding:isac",
+  ]
+}
+
+test("audio_decoder_isacfix_fuzzer") {
+  sources = [
+    "audio_decoder_isacfix_fuzzer.cc",
+  ]
+  deps = [
+    ":audio_decoder_fuzzer",
+    "../../modules/audio_coding:isac_fix",
+  ]
+}
+
+test("audio_decoder_opus_fuzzer") {
+  sources = [
+    "audio_decoder_opus_fuzzer.cc",
+  ]
+  deps = [
+    ":audio_decoder_fuzzer",
+    "../../modules/audio_coding:webrtc_opus",
+  ]
+}
